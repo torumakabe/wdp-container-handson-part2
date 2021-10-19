@@ -1,4 +1,4 @@
-# WEB+DB PRESS Vol.127 第2章 ハンズオン用コード
+# WEB+DB PRESS Vol.126 第2章 ハンズオン用コード
 
 * オリジナルは [Try Out Development Containers: Go](https://github.com/microsoft/wdp-container-handson-part2) です
   * 本誌ではコードをシンプルに、紹介する機能も絞っています
