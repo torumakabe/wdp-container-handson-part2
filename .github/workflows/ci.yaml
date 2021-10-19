@@ -1,0 +1,53 @@
+name: "CI"
+
+on:
+  push:
+    tags-ignore:
+      - "*"
+    branches:
+      - "main"
+    paths-ignore:
+      - "README.md"
+  pull_request:
+    paths-ignore:
+      - "README.md"
+  workflow_dispatch:
+
+jobs:
+  ci:
+    name: "CI"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Setup Go"
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+
+      - name: "Checkout"
+        uses: actions/checkout@v2
+
+      - name: "go vet"
+        run: go vet ./...
+
+      - name: "go test"
+        run: go test -v ./...
+
+      - name: "Prepare container scan"
+        id: prep
+        run: |
+          REPO_NAME=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')
+          echo ::set-output name=repo_name::${REPO_NAME}
+
+      - name: "Build container"
+        run: docker build . -t ghcr.io/${{ steps.prep.outputs.repo_name }}:scan-tmp
+
+      - name: "Scan container"
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'ghcr.io/${{ steps.prep.outputs.repo_name }}:scan-tmp'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
