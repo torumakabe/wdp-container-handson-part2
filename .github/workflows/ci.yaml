@@ -37,7 +37,7 @@ jobs:
         id: prep
         run: |
           REPO_NAME=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')
-          echo ::set-output name=repo_name::${REPO_NAME}
+          echo "repo_name=${REPO_NAME}" >> $GITHUB_OUTPUT
 
       - name: "Build container"
         run: docker build . -t ghcr.io/${{ steps.prep.outputs.repo_name }}:scan-tmp
